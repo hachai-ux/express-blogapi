@@ -9,6 +9,13 @@ var CommentSchema = new Schema({
 
 })
 
+// Virtual for URL
+CommentSchema
+.virtual('url')
+.get(function () {
+  return '/comments/' + this._id;
+});
+
 
 
 //Export model

@@ -3,6 +3,7 @@ var Comment = require('../models/comment');
 const { body, validationResult } = require('express-validator');
 
 exports.posts_get = function (req, res, next) {
+    //Get all posts
     Post.find()
         .populate('comment')
         .exec(function (err, posts) {
