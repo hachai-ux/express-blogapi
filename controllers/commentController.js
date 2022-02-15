@@ -4,7 +4,7 @@ const { body, validationResult } = require('express-validator');
 
 exports.comments_get = function (req, res, next) {
     //get all comments of a post
-    Post.findById(req.params.id)
+    Post.findById(req.params.postid)
         .populate('comment')
         .exec(function (err, post) {
             if (err) { return next(err); }
