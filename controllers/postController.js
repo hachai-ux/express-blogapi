@@ -1,6 +1,8 @@
 var Post = require('../models/post');
 var Comment = require('../models/comment');
 const { body, validationResult } = require('express-validator');
+const App = require('../app');
+//const db = App.db; doesnt't work for some reason
 
 exports.posts_get = function (req, res, next) {
     //Get all posts
@@ -105,24 +107,30 @@ exports.post_update = function (req, res, next) {
 exports.post_delete = async function (req, res, next) {
     //Use transaction to reverse if if either deleting posts or comments fails
     //Use deletemany to delete all comments
+    //use req.params.postid, not req.body.postid
 
- 
+
+
     async function deletePostAndComments() {
+        console.log(App.db);
+
+        console.log(req.params.postid);
         try {
-            const session = await db.startSession();
+            
+            const session = await App.db.startSession();
             await session.withTransaction(async () => {
-                Post.findByIdAndRemove(req.body.postid, function deleteBook(err) {
+                Post.findByIdAndRemove(req.params.postid, function deleteBook(err) {
                     if (err) { return next(err); }
                     
             
                 })
-                await Comment.deleteMany({ 'post': req.body.postid });
+                //Comment.deleteMany({ 'post': req.params.postid });
             });
             session.endSession();
             res.send('Post and its comments deleted');
         }
         catch (error) {
-            res.send(error);
+            res.send('Transaction failed. Something went wrong.');
         }
     }
     deletePostAndComments();

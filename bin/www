@@ -4,9 +4,10 @@
  * Module dependencies.
  */
 
-var { app } = require('../app');
+var App = require('../app');
 var debug = require('debug')('express-blogapi:server');
 var http = require('http');
+const app = App.app;
 
 /**
  * Get port from environment and store in Express.
