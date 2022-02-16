@@ -6,6 +6,7 @@ var CommentSchema = new Schema({
     timestamp: { type: Date, default: Date.now},
     text: { type: String, required: true, maxLength: 500 },
     name: { type: String, required: true, maxLength: 50 },
+    post: {type: Schema.Types.ObjectId, required: true, ref: 'Post'}
 
 })
 
