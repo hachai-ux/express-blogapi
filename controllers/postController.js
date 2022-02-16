@@ -63,28 +63,29 @@ exports.post_post = [
 
 
 
-exports.post_update = function (req, res, next) {
-    [
+exports.post_update =  [
 
+     
     // Validate and sanitise fields.
     body('title', 'Title must be specified').trim().isLength({ min: 1 }).escape(),
     body('text', 'Text must be specified').trim().isLength({ min: 1 }).escape(),
+    body('state', 'State must "published" or "unpublished"').custom((value)=> (value === "unpublished") || (value === "published")).trim().isLength({ min: 1 }).escape(),
 
     // Process request after validation and sanitization.
     (req, res, next) => {
-
+           console.log(req.params.postid);
         console.log(req.me);
         // Extract the validation errors from a request.
         const errors = validationResult(req);
 
     
-        var post = new Post(
+        var post = 
           { title: req.body.title,
             timestamp: Date.now(),
             text: req.body.text,
             user: req.me,
-            state: 'unpublished'
-           });
+            state: req.body.state
+           };
 
         if (!errors.isEmpty()) {
             // There are errors. Post error messages
@@ -101,7 +102,6 @@ exports.post_update = function (req, res, next) {
     }
 ];
 
-};
 
 //Delete post and it's comments
 exports.post_delete = async function (req, res, next) {
@@ -112,9 +112,7 @@ exports.post_delete = async function (req, res, next) {
 
 
     async function deletePostAndComments() {
-        console.log(App.db);
 
-        console.log(req.params.postid);
         try {
             
             const session = await App.db.startSession();
@@ -124,7 +122,7 @@ exports.post_delete = async function (req, res, next) {
                     
             
                 })
-                //Comment.deleteMany({ 'post': req.params.postid });
+                Comment.deleteMany({ 'post': req.params.postid });
             });
             session.endSession();
             res.send('Post and its comments deleted');
