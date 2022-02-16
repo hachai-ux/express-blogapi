@@ -117,7 +117,7 @@ exports.post_delete = async function (req, res, next) {
             
             const session = await App.db.startSession();
             await session.withTransaction(async () => {
-                Post.findByIdAndRemove(req.params.postid, function deleteBook(err) {
+                Post.findByIdAndRemove(req.params.postid, function deletePost(err) {
                     if (err) { return next(err); }
                     
             

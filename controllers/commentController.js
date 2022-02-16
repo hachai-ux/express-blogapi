@@ -4,28 +4,100 @@ const { body, validationResult } = require('express-validator');
 
 exports.comments_get = function (req, res, next) {
     //get all comments of a post
-    Post.findById(req.params.postid)
-        .populate('comment')
-        .exec(function (err, post) {
+    Comment.find({ 'post': req.params.postid })
+        .exec(function (err, comments) {
             if (err) { return next(err); }
             //Successful, so send JSON
-            res.json(post);
+            res.json(comments);
         })
 
 }
 
 exports.comment_get = function (req, res, next) {
-    res.send('Get Comment');
+    Comment.findById(req.params.commentid)
+        .exec(function (err, comment) {
+            if (err) { return next(err); }
+            //Successful, so render
+            res.json(comment);
+        });
 }
 
-exports.comment_post = function (req, res, next) {
-    res.send('Send Comment');;
-};
+exports.comment_post = [
 
-exports.comment_update = function (req, res, next) {
-    res.send('Update Comment');;
-};
+    // Validate and sanitise fields.
+    body('name', 'Name must be specified').trim().isLength({ min: 1 }).escape(),
+    body('text', 'Text must be specified').trim().isLength({ min: 1 }).escape(),
+
+    // Process request after validation and sanitization.
+    (req, res, next) => {
+
+        // Extract the validation errors from a request.
+        const errors = validationResult(req);
+
+        // Create a BookInstance object with escaped and trimmed data.
+        var comment = new Comment(
+            {
+                name: req.body.name,
+                timestamp: Date.now(),
+                text: req.body.text,
+                post: req.params.postid,
+            });
+
+        if (!errors.isEmpty()) {
+            // There are errors. Post error messages
+            res.json(errors);
+        }
+        else {
+       
+            comment.save(function (err) {
+                if (err) { return next(err); }
+                //successful
+                res.send('Comment created in DB');
+            });
+        }
+    }
+];
+
+exports.comment_update = [
+
+     
+    // Validate and sanitise fields.
+    body('name', 'Name must be specified').trim().isLength({ min: 1 }).escape(),
+    body('text', 'Text must be specified').trim().isLength({ min: 1 }).escape(),
+
+
+    // Process request after validation and sanitization.
+    (req, res, next) => {
+
+        // Extract the validation errors from a request.
+        const errors = validationResult(req);
+
+    
+        var comment = 
+          { text: req.body.text,
+           };
+
+        if (!errors.isEmpty()) {
+            // There are errors. Post error messages
+                    res.json(errors);
+        }
+        else {
+       
+            Comment.findByIdAndUpdate(req.params.commentid, comment, {}, function (err, thecomment) {
+                if (err) { return next(err); }
+                   //successful
+                   res.send('Comment updated');
+                });
+        }
+    }
+];
+
 
 exports.comment_delete = function (req, res, next) {
-    res.send('Delete Comment');;
+    Comment.findByIdAndRemove(req.params.commentid, function deleteComment(err) {
+        if (err) { return next(err); }
+                    
+            
+    });
+    res.send('Comment deleted');
 };
