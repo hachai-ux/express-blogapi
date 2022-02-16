@@ -16,5 +16,13 @@ UserSchema
   return '/user' + this._id;
 });
 
+const User = mongoose.model('User', UserSchema);
+
+const user = new User({
+    username: "User",
+    password: "Password123456"
+});
+
 //Export model
-module.exports = mongoose.model('User', UserSchema);
+exports.User = User;
+exports.user = user;

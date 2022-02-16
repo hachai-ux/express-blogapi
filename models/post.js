@@ -7,7 +7,7 @@ var PostSchema = new Schema({
     timestamp: { type: Date, default: Date.now},
     text: { type: String, required: true, maxLength: 2000 },
     user: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
-    comment: { type: Schema.Types.ObjectId, required: true, ref: 'Comment' },
+    comment: { type: Schema.Types.ObjectId, ref: 'Comment' },
     state: { type: String, required: true, enum: ['unpublished', 'published'] }
 
 })

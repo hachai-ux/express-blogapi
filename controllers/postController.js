@@ -27,21 +27,20 @@ exports.post_post = [
     // Validate and sanitise fields.
     body('title', 'Title must be specified').trim().isLength({ min: 1 }).escape(),
     body('text', 'Text must be specified').trim().isLength({ min: 1 }).escape(),
-    body('user', 'User must be specified').trim().isLength({ min: 1 }).escape(),
 
     // Process request after validation and sanitization.
     (req, res, next) => {
 
+        console.log(req.me);
         // Extract the validation errors from a request.
         const errors = validationResult(req);
 
         // Create a BookInstance object with escaped and trimmed data.
-        var postinstance = new PostInstance(
+        var post = new Post(
           { title: req.body.title,
             timestamp: Date.now(),
             text: req.body.text,
-            user: req.body.user,
-            comment: {},
+            user: req.me,
             state: 'unpublished'
            });
 
@@ -51,7 +50,7 @@ exports.post_post = [
         }
         else {
        
-            postinstance.save(function (err) {
+            post.save(function (err) {
                 if (err) { return next(err); }
                    //successful
                    res.send('Post created in DB');
@@ -60,7 +59,7 @@ exports.post_post = [
     }
 ];
 
-};
+
 
 exports.post_update = function (req, res, next) {
     res.send('Update Post');;
