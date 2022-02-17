@@ -122,7 +122,9 @@ exports.post_delete = async function (req, res, next) {
                     
             
                 })
-                Comment.deleteMany({ 'post': req.params.postid });
+
+                console.log(req.params.postid);
+                await Comment.deleteMany({ 'post': req.params.postid });
             });
             session.endSession();
             res.send('Post and its comments deleted');
