@@ -33,7 +33,7 @@ exports.comment_post = [
 
         // Extract the validation errors from a request.
         const errors = validationResult(req);
-
+        console.log(req.params.postid);
         // Create a BookInstance object with escaped and trimmed data.
         var comment = new Comment(
             {
