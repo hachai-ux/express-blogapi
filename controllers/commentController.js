@@ -8,7 +8,7 @@ exports.comments_get = function (req, res, next) {
         .exec(function (err, comments) {
             if (err) { return next(err); }
             //Successful, so send JSON
-            res.json(comments);
+            return res.json(comments);
         })
 
 }
@@ -18,7 +18,7 @@ exports.comment_get = function (req, res, next) {
         .exec(function (err, comment) {
             if (err) { return next(err); }
             //Successful, so render
-            res.json(comment);
+            return res.json(comment);
         });
 }
 
@@ -45,14 +45,14 @@ exports.comment_post = [
 
         if (!errors.isEmpty()) {
             // There are errors. Post error messages
-            res.json(errors);
+            return res.json(errors);
         }
         else {
        
             comment.save(function (err) {
                 if (err) { return next(err); }
                 //successful
-                res.json(comment);
+                return res.json(comment);
             });
         }
     }
@@ -79,14 +79,14 @@ exports.comment_update = [
 
         if (!errors.isEmpty()) {
             // There are errors. Post error messages
-                    res.json(errors);
+                    return res.json(errors);
         }
         else {
        
             Comment.findByIdAndUpdate(req.params.commentid, comment, {}, function (err, thecomment) {
                 if (err) { return next(err); }
                    //successful
-                   res.json(comment);
+                   return res.json(comment);
                 });
         }
     }
@@ -99,5 +99,5 @@ exports.comment_delete = function (req, res, next) {
                     
             
     });
-    res.json({deleted: req.params.commentid});
+    return res.json({deleted: req.params.commentid});
 };

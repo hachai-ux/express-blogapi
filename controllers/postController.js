@@ -11,7 +11,7 @@ exports.posts_get = function (req, res, next) {
         .exec(function (err, posts) {
             if (err) { return next(err); }
             //Successful, so send JSON
-            res.json(posts);
+            return res.json(posts);
         })
 }
 
@@ -20,7 +20,7 @@ exports.post_get = function (req, res, next) {
         .exec(function (err, post) {
             if (err) { return next(err); }
             //Successful, so render
-            res.json(post);
+            return res.json(post);
         });
 }
 
@@ -48,14 +48,14 @@ exports.post_post = [
 
         if (!errors.isEmpty()) {
             // There are errors. Post error messages
-                    res.json(errors);
+                    return res.json(errors);
         }
         else {
        
             post.save(function (err) {
                 if (err) { return next(err); }
                    //successful
-                   res.json(post);
+                   return res.json(post);
                 });
         }
     }
@@ -89,14 +89,14 @@ exports.post_update =  [
 
         if (!errors.isEmpty()) {
             // There are errors. Post error messages
-                    res.json(errors);
+                    return res.json(errors);
         }
         else {
        
             Post.findByIdAndUpdate(req.params.postid, post, {}, function (err, thepost) {
                 if (err) { return next(err); }
                    //successful
-                   res.json('post');
+                   return res.json('post');
                 });
         }
     }
@@ -127,10 +127,10 @@ exports.post_delete = async function (req, res, next) {
                 await Comment.deleteMany({ 'post': req.params.postid });
             });
             session.endSession();
-            res.json({ deleted: req.params.postid});
+            return res.json({ deleted: req.params.postid});
         }
         catch (error) {
-            res.json(error);
+            return res.json(error);
         }
     }
     deletePostAndComments();
