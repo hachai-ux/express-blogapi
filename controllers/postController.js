@@ -127,10 +127,10 @@ exports.post_delete = async function (req, res, next) {
                 await Comment.deleteMany({ 'post': req.params.postid });
             });
             session.endSession();
-            res.send('Post and its comments deleted');
+            res.json({ deleted: req.params.postid});
         }
         catch (error) {
-            res.json({ deleted: req.params.postid});
+            res.json(error);
         }
     }
     deletePostAndComments();
