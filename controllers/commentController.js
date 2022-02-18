@@ -52,7 +52,7 @@ exports.comment_post = [
             comment.save(function (err) {
                 if (err) { return next(err); }
                 //successful
-                res.send('Comment created in DB');
+                res.json(comment);
             });
         }
     }
@@ -86,7 +86,7 @@ exports.comment_update = [
             Comment.findByIdAndUpdate(req.params.commentid, comment, {}, function (err, thecomment) {
                 if (err) { return next(err); }
                    //successful
-                   res.send('Comment updated');
+                   res.json(comment);
                 });
         }
     }
@@ -99,5 +99,5 @@ exports.comment_delete = function (req, res, next) {
                     
             
     });
-    res.send('Comment deleted');
+    res.json({deleted: req.params.commentid});
 };

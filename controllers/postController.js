@@ -55,7 +55,7 @@ exports.post_post = [
             post.save(function (err) {
                 if (err) { return next(err); }
                    //successful
-                   res.send('Post created in DB');
+                   res.json(post);
                 });
         }
     }
@@ -96,7 +96,7 @@ exports.post_update =  [
             Post.findByIdAndUpdate(req.params.postid, post, {}, function (err, thepost) {
                 if (err) { return next(err); }
                    //successful
-                   res.send('Post updated');
+                   res.json('post');
                 });
         }
     }
@@ -130,7 +130,7 @@ exports.post_delete = async function (req, res, next) {
             res.send('Post and its comments deleted');
         }
         catch (error) {
-            res.send('Transaction failed. Something went wrong.');
+            res.json({ deleted: req.params.postid});
         }
     }
     deletePostAndComments();
