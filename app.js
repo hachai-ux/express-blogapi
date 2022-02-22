@@ -1,4 +1,5 @@
 require('dotenv').config()
+var User = require('./models/user');
 var createError = require('http-errors');
 var express = require('express');
 var cors = require('cors')
@@ -7,38 +8,22 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
-const jwt = require('jsonwebtoken');
+
+
 
 const passportJWT = require("passport-jwt");
 const JWTStrategy = passportJWT.Strategy;
 const ExtractJWT = passportJWT.ExtractJwt;
 
-var User = require('./models/user');
 
-var indexRouter = require('./routes/index');
-var postsRouter = require('./routes/posts');
-var commentsRouter = require('./routes/comments');
-var usersRouter = require('./routes/users');
-var loginRouter = require('./routes/login');
 
-var app = express();
-
-//Set up mongoose connection
-var mongoose = require('mongoose');
-var mongoDB = process.env.MONGODB_URI;
-mongoose.connect(mongoDB, { useNewUrlParser: true , useUnifiedTopology: true});
-var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
-
-passport.use(new LocalStrategy({
-  username: User.user.name,
-  password: User.user.password
-},
+passport.use(new LocalStrategy(
     function (username, password, cb) {
 
 //this one is typically a DB call. Assume that the returned user object is pre-formatted and ready for storing in JWT
-
-      return User.findOne({username, password})
+     
+  
+      return User.User.findOne({username, password})
                 .then(user => {
                     if (!user) {
                         return cb(null, false, {message: 'Incorrect username or password.'});
@@ -55,7 +40,7 @@ passport.use(new LocalStrategy({
     function (jwtPayload, cb) {
 
         //find the user in db if needed. This functionality may be omitted if you store everything you'll need in JWT payload.
-        return User.findOneById(jwtPayload.id)
+        return User.User.findOneById(jwtPayload.id)
             .then(user => {
                 return cb(null, user);
             })
@@ -64,6 +49,23 @@ passport.use(new LocalStrategy({
             });
     }
 ));
+
+var indexRouter = require('./routes/index');
+var postsRouter = require('./routes/posts');
+var commentsRouter = require('./routes/comments');
+var usersRouter = require('./routes/users');
+var loginRouter = require('./routes/login');
+
+var app = express();
+
+//Set up mongoose connection
+var mongoose = require('mongoose');
+var mongoDB = process.env.MONGODB_URI;
+mongoose.connect(mongoDB, { useNewUrlParser: true , useUnifiedTopology: true});
+var db = mongoose.connection;
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
