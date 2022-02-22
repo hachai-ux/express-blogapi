@@ -1,4 +1,3 @@
-
 require('dotenv').config()
 var createError = require('http-errors');
 var express = require('express');
@@ -6,11 +5,21 @@ var cors = require('cors')
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+const jwt = require('jsonwebtoken');
+
+const passportJWT = require("passport-jwt");
+const JWTStrategy = passportJWT.Strategy;
+const ExtractJWT = passportJWT.ExtractJwt;
+
+var User = require('./models/user');
 
 var indexRouter = require('./routes/index');
 var postsRouter = require('./routes/posts');
 var commentsRouter = require('./routes/comments');
 var usersRouter = require('./routes/users');
+var loginRouter = require('./routes/login');
 
 var app = express();
 
@@ -20,6 +29,41 @@ var mongoDB = process.env.MONGODB_URI;
 mongoose.connect(mongoDB, { useNewUrlParser: true , useUnifiedTopology: true});
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+
+passport.use(new LocalStrategy({
+  username: User.user.name,
+  password: User.user.password
+},
+    function (username, password, cb) {
+
+//this one is typically a DB call. Assume that the returned user object is pre-formatted and ready for storing in JWT
+
+      return User.findOne({username, password})
+                .then(user => {
+                    if (!user) {
+                        return cb(null, false, {message: 'Incorrect username or password.'});
+                    }
+                return cb(null, user, {message: 'Logged In Successfully'});
+                })
+                .catch(err => cb(err));
+  }));
+
+  passport.use(new JWTStrategy({
+        jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken(),
+        secretOrKey : 'your_jwt_secret'
+    },
+    function (jwtPayload, cb) {
+
+        //find the user in db if needed. This functionality may be omitted if you store everything you'll need in JWT payload.
+        return User.findOneById(jwtPayload.id)
+            .then(user => {
+                return cb(null, user);
+            })
+            .catch(err => {
+                return cb(err);
+            });
+    }
+));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -33,9 +77,12 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/api/posts', postsRouter);
-app.use('/api/posts/:postid/comments', commentsRouter);
-app.use('/users', usersRouter);
+app.use('/api/login', loginRouter);
+app.use('/api/posts',postsRouter);
+app.use('/api/posts/:postid/comments',commentsRouter);
+app.use('/users', passport.authenticate('jwt', {session: false}), usersRouter);
+
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

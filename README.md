@@ -1,5 +1,10 @@
 # express-blogapi
 
+JWT auth branch
+
+- get JWT token per login branch
+- send JWT token in Authorization Header as a Bearer Token to access protected routes
+
 Backend for the Blog API
 -- provides REST API for CRUD posts and comments --
 
